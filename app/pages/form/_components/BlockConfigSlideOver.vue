@@ -17,8 +17,6 @@ const emit = defineEmits<{
     ): void;
 }>();
 
-const open = ref(true);
-
 // ─── Cópia local reativa para edição ─────────────────────────────────────────
 // Trabalhamos numa cópia para não mutar o prop diretamente.
 // Ao confirmar, emitimos o bloco atualizado de volta.
@@ -73,7 +71,7 @@ function onRemove() {
 </script>
 
 <template>
-    <USlideover v-model:open="open" side="right">
+    <USlideover side="right">
         <template #header>
             <div class="flex items-center gap-2">
                 <UIcon
