@@ -40,7 +40,7 @@ type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
     try {
-        await $api("auth/login/", {
+        await $api("/access/login/", {
             body: payload.data,
             method: "POST",
             onResponseError: ({ response }) => {

@@ -12,7 +12,7 @@ const user = getUser();
 
 const logout = async () => {
     try {
-        await $api("/auth/logout/", {
+        await $api("/access/logout/", {
             method: "POST",
         });
 

@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const csrf = useCookie<string | undefined>("csrftoken");
 
   if (!csrf.value) {
-    await $fetch("auth/csrf/", {
+    await $fetch("/access/csrf/", {
       baseURL: "/api",
       credentials: "include",
     });
