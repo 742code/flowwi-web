@@ -2,10 +2,8 @@
 import type { TabsItem } from "@nuxt/ui";
 import type { tFormBlockOut, tFormOut } from "../_schemas/form";
 import { LazyCBlockConfigSlideOver } from "#components";
-import type {
-    BlockDraft,
-    SupportedBlockType,
-} from "./BlockConfigSlideOver.vue";
+import type { BlockDraft, SupportedBlockType } from "../_types/block";
+import { blockTypeMeta, getDefaultConfig, cleanConfig } from "../_utils/blockParser";
 
 const { $api } = useNuxtApp();
 
@@ -33,17 +31,6 @@ const tabs: TabsItem[] = [
     },
 ];
 
-const blockTypeMeta: Record<
-    SupportedBlockType,
-    { label: string; icon: string }
-> = {
-    short_text: { label: "Short text", icon: "i-lucide-text" },
-    number: { label: "Number", icon: "i-lucide-hash" },
-    date: { label: "Date", icon: "i-lucide-calendar" },
-    select: { label: "Select", icon: "i-lucide-list" },
-    file: { label: "File", icon: "i-lucide-paperclip" },
-};
-
 const blockTypeDropdownItems = [
     Object.entries(blockTypeMeta).map(([value, meta]) => ({
         label: meta.label,
@@ -51,41 +38,6 @@ const blockTypeDropdownItems = [
         onSelect: () => addBlock(value as SupportedBlockType),
     })),
 ];
-
-// ─── Config defaults ──────────────────────────────────────────────────────────
-
-function getDefaultConfig(type: SupportedBlockType): Record<string, unknown> {
-    switch (type) {
-        case "short_text":
-            return {
-                min_length: null,
-                max_length: null,
-                pattern: null,
-            };
-        case "number":
-            return {
-                min: null,
-                max: null,
-                step: null,
-            };
-        case "date":
-            return {
-                min_date: null,
-                max_date: null,
-            };
-        case "select":
-            return {
-                options: [{ label: "", value: "" }],
-                multiple: false,
-            };
-        case "file":
-            return {
-                accept: [],
-                max_size: null,
-                multiple: false,
-            };
-    }
-}
 
 const blocksDraft = ref<BlockDraft[]>([]);
 const activeBlockKey = ref<string | null>(null);
@@ -185,18 +137,6 @@ function blockActionItems(block: BlockDraft) {
             },
         ],
     ];
-}
-
-// ─── Clean config ─────────────────────────────────────────────────────────────
-
-function cleanConfig(_type: SupportedBlockType, raw: Record<string, unknown>) {
-    const cleaned: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(raw)) {
-        if (v === null || v === "" || (Array.isArray(v) && v.length === 0))
-            continue;
-        cleaned[k] = v;
-    }
-    return cleaned;
 }
 
 // ─── Submit ───────────────────────────────────────────────────────────────────
