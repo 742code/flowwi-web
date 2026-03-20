@@ -1,19 +1,6 @@
 <script setup lang="ts">
-export type SupportedBlockType =
-    | "short_text"
-    | "number"
-    | "date"
-    | "select"
-    | "file";
-
-export type BlockDraft = {
-    key: string;
-    title: string;
-    type: SupportedBlockType;
-    required: boolean;
-    order: number;
-    config: Record<string, unknown>;
-};
+import type { SupportedBlockType, BlockDraft } from "../_types/block";
+import { blockTypeMeta, getDefaultConfig } from "../_utils/blockParser";
 
 const props = defineProps<{
     block: BlockDraft;
@@ -30,26 +17,11 @@ const emit = defineEmits<{
     ): void;
 }>();
 
-const open = ref(true);
-
 // ─── Cópia local reativa para edição ─────────────────────────────────────────
 // Trabalhamos numa cópia para não mutar o prop diretamente.
 // Ao confirmar, emitimos o bloco atualizado de volta.
 
 const draft = reactive<BlockDraft>(JSON.parse(JSON.stringify(props.block)));
-
-// ─── Block type meta ──────────────────────────────────────────────────────────
-
-const blockTypeMeta: Record<
-    SupportedBlockType,
-    { label: string; icon: string }
-> = {
-    short_text: { label: "Short text", icon: "i-lucide-text" },
-    number: { label: "Number", icon: "i-lucide-hash" },
-    date: { label: "Date", icon: "i-lucide-calendar" },
-    select: { label: "Select", icon: "i-lucide-list" },
-    file: { label: "File", icon: "i-lucide-paperclip" },
-};
 
 const blockTypeSelectItems = Object.entries(blockTypeMeta).map(
     ([value, m]) => ({
@@ -65,21 +37,6 @@ watch(
         if (newType !== oldType) draft.config = getDefaultConfig(newType);
     },
 );
-
-function getDefaultConfig(type: SupportedBlockType): Record<string, unknown> {
-    switch (type) {
-        case "short_text":
-            return { min_length: null, max_length: null, pattern: null };
-        case "number":
-            return { min: null, max: null, step: null };
-        case "date":
-            return { min_date: null, max_date: null };
-        case "select":
-            return { options: [{ label: "", value: "" }], multiple: false };
-        case "file":
-            return { accept: [], max_size: null, multiple: false };
-    }
-}
 
 // ─── Select options ───────────────────────────────────────────────────────────
 
@@ -114,7 +71,7 @@ function onRemove() {
 </script>
 
 <template>
-    <USlideover v-model:open="open" side="right">
+    <USlideover side="right">
         <template #header>
             <div class="flex items-center gap-2">
                 <UIcon
